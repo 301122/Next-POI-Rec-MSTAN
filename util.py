@@ -367,18 +367,11 @@ def data_partition(fpath, args):
             user_valid[user] = []
             user_test[user] = []
         else:
-            if not args.use_new_partition:
-                user_train[user] = User[user][:valid_ratio]
-                user_valid[user] = []
-                user_valid[user].append(User[user][valid_ratio:test_ratio])
-                user_test[user] = []
-                user_test[user].append(User[user][test_ratio:])  #
-            else:
-                user_train[user] = User[user][:-2]
-                user_valid[user] = []
-                user_valid[user].append(User[user][-2:-1])
-                user_test[user] = []
-                user_test[user].append(User[user][-1:])  #
+            user_train[user] = User[user][:valid_ratio]
+            user_valid[user] = []
+            user_valid[user].append(User[user][valid_ratio:test_ratio])
+            user_test[user] = []
+            user_test[user].append(User[user][test_ratio:])
     return [user_train, user_valid, user_test, usernum, itemnum, timenum, max_origin_seq_len], poi_rating_dict
 
 
