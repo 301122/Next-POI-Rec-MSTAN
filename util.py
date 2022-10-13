@@ -79,42 +79,6 @@ def computedisPos(time_seq, time_span):
     return dis_matrix, dis_matrix_lat, dis_matrix_lon
 
 
-def Relation(user_train, usernum, maxlen, maxlen_origin, time_span, max_origin_seq_len, args):
-    data_train = dict()
-    data_train_origin = dict()
-    for user in tqdm(range(1, usernum + 1), desc='Preparing relation matrix'):
-        time_seq = np.zeros([maxlen], dtype=np.int32)
-        time_seq_origin = np.zeros([max_origin_seq_len], dtype=np.int32)
-        idx = maxlen - 1
-        idx_origin = max_origin_seq_len - 1
-        for i in reversed(user_train[user][:-1]):
-            time_seq[idx] = i[1]
-            idx -= 1
-            if idx == maxlen - maxlen_origin - 1: break
-        for i in reversed(user_train[user][:-1]):
-            time_seq_origin[idx_origin] = i[1]
-            idx_origin -= 1
-            if idx_origin == -1: break
-        data_train[user] = computeRePos(time_seq, time_span)
-        data_train_origin[user] = computeRePos(time_seq_origin, time_span)
-    return data_train, data_train_origin
-
-
-def Relation_dis(user_train, usernum, maxlen, maxlen_origin, time_span, args):
-    data_train = dict()
-    data_train_lat = dict()
-    data_train_lon = dict()
-    for user in tqdm(range(1, usernum + 1), desc='Preparing dis relation matrix'):
-        seq = ['0,0'] * maxlen
-        idx = maxlen - 1
-        for i in reversed(user_train[user][:-1]):
-            seq[idx] = i[2]
-            idx -= 1
-            if idx == maxlen - maxlen_origin - 1: break
-        data_train[user], data_train_lat[user], data_train_lon[user] = computedisPos(seq, time_span)
-    return data_train, data_train_lat, data_train_lon
-
-
 def Poi_dis_matrix(poi_rating_dict, item_num, args):
     time_span = args.time_span
     dis_matrix = np.zeros([item_num + 1, item_num + 1])
@@ -385,7 +349,7 @@ def evaluate(model, dataset, args, sess, adj_matrix, tra_matrix, all_poi_dis_mat
         users = random.sample(range(1, usernum + 1), 10000)
     else:
         users = range(1, usernum + 1)
-    path_to_pkl = './data/test_data.pkl'
+    path_to_pkl = './data/' + args.dataset + '/test_data.pkl'
     try:
         with open(path_to_pkl, 'rb') as f:
             all_u = pickle.load(f)
@@ -559,7 +523,7 @@ def evaluate_valid(model, dataset, args, sess, adj_matrix, tra_matrix, all_poi_d
     else:
         users = range(1, usernum + 1)
 
-    path_to_pkl = './data/valid_data.pkl'
+    path_to_pkl = './data/' + args.dataset + '/valid_data.pkl'
     try:
         with open(path_to_pkl, 'rb') as f:
             all_u = pickle.load(f)

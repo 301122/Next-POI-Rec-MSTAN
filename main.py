@@ -27,7 +27,7 @@ np.random.seed(2022)
 tf.set_random_seed(2022)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='Gowalla', type=str)
+parser.add_argument('--dataset', default='Foursquare', type=str)
 parser.add_argument('--batch_size', default=64, type=int)
 parser.add_argument('--test_batch_size', default=64, type=int)
 parser.add_argument('--train_filter', default=4, type=int)
@@ -63,7 +63,7 @@ with open(os.path.join(path_name, 'args.txt'), 'w') as f:
 f.close()
 dis_matrix_path = './data/' + args.dataset + '/distance_matrix_train.npz'
 tra_matrix_path = './data/' + args.dataset + '/transition_matrix_train.npz'
-fpath = './poidata/' + args.dataset + '/processed_' + args.dataset + '.txt'
+fpath = './data/' + args.dataset + '/processed_' + args.dataset + '.txt'
 
 dataset, poi_rating_dict = data_partition(fpath, args)
 dataset[-1] = 300
@@ -93,73 +93,34 @@ matrix = get_adj_matrix(matrix)
 matrix1 = get_adj_matrix(matrix1)
 
 dataset_name = args.dataset
-try:
-    relation_matrix = pickle.load(
-        open('./poidata/processed_data/%s/relation_matrix_%s_%d_%d.pickle' % (
-            dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
-    relation_matrix_origin = pickle.load(
-        open('./poidata/processed_data/%s/relation_matrix_origin_%s_%d_%d.pickle' % (
-            dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
-except Exception as e:
-    print('load exception: ', e)
-    relation_matrix, relation_matrix_origin = Relation(user_train, usernum, args.maxlen, args.maxlen_origin,
-                                                       args.time_span, max_origin_seq_len, args)
-    pickle.dump(relation_matrix,
-                open('./poidata/processed_data/%s/relation_matrix_%s_%d_%d.pickle' % (
-                    dataset_name, dataset_name, args.maxlen, args.time_span), 'wb'))
-    pickle.dump(relation_matrix_origin,
-                open('./poidata/processed_data/%s/relation_matrix_origin_%s_%d_%d.pickle' % (
-                    dataset_name, dataset_name, args.maxlen, args.time_span), 'wb'))
 
-try:
-    dis_relation_matrix = pickle.load(
-        open('./poidata/processed_data/%s/relation_dis_matrix_%s_%d_%d.pickle' % (
-        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
-    dis_relation_matrix_lat = pickle.load(
-        open('./poidata/processed_data/%s/relation_dis_matrix_lat_%s_%d_%d.pickle' % (
-        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
-    dis_relation_matrix_lon = pickle.load(
-        open('./poidata/processed_data/%s/relation_dis_matrix_lon_%s_%d_%d.pickle' % (
-        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
-except:
-    dis_relation_matrix, dis_relation_matrix_lat, dis_relation_matrix_lon = Relation_dis(user_train, usernum,
-                                                                                         args.maxlen,
-                                                                                         args.maxlen_origin,
-                                                                                         args.time_span, args)
-    pickle.dump(dis_relation_matrix,
-                open('./poidata/processed_data/%s/relation_dis_matrix_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, args.maxlen, args.time_span), 'wb'))
-    pickle.dump(dis_relation_matrix_lat,
-                open('./poidata/processed_data/%s/relation_dis_matrix_lat_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, args.maxlen, args.time_span),
-                     'wb'))
-    pickle.dump(dis_relation_matrix_lon,
-                open('./poidata/processed_data/%s/relation_dis_matrix_lon_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, args.maxlen, args.time_span),
-                     'wb'))
+relation_matrix = pickle.load(
+        open('./data/%s/relation_matrix_%s_%d_%d.pickle' % (
+            dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
+relation_matrix_origin = pickle.load(
+        open('./data/%s/relation_matrix_origin_%s_%d_%d.pickle' % (
+            dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
 
-try:
-    all_poi_dis_matrix = pickle.load(
-        open('./poidata/processed_data/%s/poi_dis_matrix_%s_%d_%d.pickle' % (
+dis_relation_matrix = pickle.load(
+        open('./data/%s/relation_dis_matrix_%s_%d_%d.pickle' % (
+        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
+dis_relation_matrix_lat = pickle.load(
+        open('./data/%s/relation_dis_matrix_lat_%s_%d_%d.pickle' % (
+        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
+dis_relation_matrix_lon = pickle.load(
+        open('./data/%s/relation_dis_matrix_lon_%s_%d_%d.pickle' % (
+        dataset_name, dataset_name, args.maxlen, args.time_span), 'rb'))
+
+all_poi_dis_matrix = pickle.load(
+        open('./data/%s/poi_dis_matrix_%s_%d_%d.pickle' % (
         dataset_name, dataset_name, itemnum, args.time_span), 'rb'))
-    all_poi_dis_matrix_lat = pickle.load(
-        open('./poidata/processed_data/%s/poi_dis_matrix_lat_%s_%d_%d.pickle' % (
+all_poi_dis_matrix_lat = pickle.load(
+        open('./data/%s/poi_dis_matrix_lat_%s_%d_%d.pickle' % (
         dataset_name, dataset_name, itemnum, args.time_span), 'rb'))
-    all_poi_dis_matrix_lon = pickle.load(
-        open('./poidata/processed_data/%s/poi_dis_matrix_lon_%s_%d_%d.pickle' % (
+all_poi_dis_matrix_lon = pickle.load(
+        open('./data/%s/poi_dis_matrix_lon_%s_%d_%d.pickle' % (
         dataset_name, dataset_name, itemnum, args.time_span), 'rb'))
-except:
-    print('Generation all poi distance matrix...')
-    all_poi_dis_matrix, all_poi_dis_matrix_lat, all_poi_dis_matrix_lon = Poi_dis_matrix(poi_rating_dict, itemnum, args)
-    pickle.dump(all_poi_dis_matrix,
-                open('./poidata/processed_data/%s/poi_dis_matrix_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, itemnum, args.time_span), 'wb'), protocol=4)
-    pickle.dump(all_poi_dis_matrix_lat,
-                open('./poidata/processed_data/%s/poi_dis_matrix_lat_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, itemnum, args.time_span), 'wb'), protocol=4)
-    pickle.dump(all_poi_dis_matrix_lon,
-                open('./poidata/processed_data/%s/poi_dis_matrix_lon_%s_%d_%d.pickle' % (
-                dataset_name, dataset_name, itemnum, args.time_span), 'wb'), protocol=4)
+
 
 sampler = WarpSampler(user_train, usernum, itemnum, max_origin_seq_len, relation_matrix, relation_matrix_origin,
                       dis_relation_matrix,

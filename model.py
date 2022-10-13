@@ -124,18 +124,6 @@ class Model():
 
         with tf.variable_scope("multi_head_self_attention", reuse=reuse):
             self.seq = tf.nn.embedding_lookup(embedding_final, self.input_seq)
-            if args.random_poi_emb:
-                self.seq = embedding(
-                    self.input_seq,
-                    vocab_size=itemnum + 1,
-                    num_units=args.hidden_units,
-                    zero_pad=False,
-                    scale=False,
-                    l2_reg=args.l2_emb,
-                    scope="seq_emb",
-                    reuse=reuse,
-                    with_t=False
-                )
             masked_seq_feature = self.seq * mask
             avg_feature = tf.reduce_sum(masked_seq_feature, axis=1)
             poi_num = tf.tile(tf.reduce_sum(mask, axis=1), [1, args.hidden_units])
